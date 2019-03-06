@@ -4,7 +4,8 @@ class DogsController < ApplicationController
   # GET /dogs
   # GET /dogs.json
   def index
-    @dogs = Dog.all
+    # @dogs = Dog.all
+    @dogs = Dog.paginate page: params[:page], per_page: 5
   end
 
   # GET /dogs/1
@@ -19,15 +20,16 @@ class DogsController < ApplicationController
 
   # GET /dogs/1/edit
   def edit
+    @dog = Dog.find(params[:id])
   end
 
   # POST /dogs
   # POST /dogs.json
   def create
     @dog = Dog.new(dog_params)
-
     respond_to do |format|
       if @dog.save
+        
         @dog.images.attach(params[:dog][:image]) if params[:dog][:image].present?
 
         format.html { redirect_to @dog, notice: 'Dog was successfully created.' }
@@ -44,11 +46,13 @@ class DogsController < ApplicationController
   def update
     respond_to do |format|
       if @dog.update(dog_params)
+        debugger
         @dog.images.attach(params[:dog][:image]) if params[:dog][:image].present?
-
+        
         format.html { redirect_to @dog, notice: 'Dog was successfully updated.' }
         format.json { render :show, status: :ok, location: @dog }
       else
+        debugger
         format.html { render :edit }
         format.json { render json: @dog.errors, status: :unprocessable_entity }
       end
