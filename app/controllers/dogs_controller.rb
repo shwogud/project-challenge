@@ -27,10 +27,14 @@ class DogsController < ApplicationController
   # POST /dogs.json
   def create
     @dog = Dog.new(dog_params)
+    @dog.user = current_user
+    params[:dog][:images].each do |image|
+      @dog.images.attach(image) 
+    end
     respond_to do |format|
       if @dog.save
+        # @dog.images.attach(params[:dog][:image]) if params[:dog][:image].present?
         
-        @dog.images.attach(params[:dog][:image]) if params[:dog][:image].present?
 
         format.html { redirect_to @dog, notice: 'Dog was successfully created.' }
         format.json { render :show, status: :created, location: @dog }
@@ -43,18 +47,23 @@ class DogsController < ApplicationController
 
   # PATCH/PUT /dogs/1
   # PATCH/PUT /dogs/1.json
-  def update
+  def update    
     respond_to do |format|
-      if @dog.update(dog_params)
-        debugger
-        @dog.images.attach(params[:dog][:image]) if params[:dog][:image].present?
+      if @dog.user_id == current_user.id 
+        if @dog.update(dog_params)
         
-        format.html { redirect_to @dog, notice: 'Dog was successfully updated.' }
-        format.json { render :show, status: :ok, location: @dog }
+          @dog.images.attach(params[:dog][:image]) if params[:dog][:image].present?
+          
+          format.html { redirect_to @dog, notice: 'Dog was successfully updated.' }
+          format.json { render :show, status: :ok, location: @dog }
+        else
+          
+          format.html { render :edit }
+          format.json { render json: @dog.errors, status: :unprocessable_entity }
+        end
+
       else
-        debugger
-        format.html { render :edit }
-        format.json { render json: @dog.errors, status: :unprocessable_entity }
+        format.html { redirect_to @dog, notice: 'Cannot Edit a Dog that you do not own!' }
       end
     end
   end
@@ -77,6 +86,6 @@ class DogsController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def dog_params
-      params.require(:dog).permit(:name, :description, :images)
+      params.require(:dog).permit(:name, :description)
     end
 end
