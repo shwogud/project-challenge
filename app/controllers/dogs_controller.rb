@@ -5,7 +5,11 @@ class DogsController < ApplicationController
   # GET /dogs.json
   def index
     # @dogs = Dog.all
-    @dogs = Dog.paginate page: params[:page], per_page: 5
+
+    @dogs = Dog.joins("LEFT OUTER JOIN likes ON likes.dog_id = dogs.id AND likes.created_at >= datetime('now', '-1 Hour')")
+      .group("id")
+      .order("COUNT(likes.id) DESC")
+      .paginate(page: params[:page], per_page: 5)
   end
 
   # GET /dogs/1
@@ -33,9 +37,6 @@ class DogsController < ApplicationController
     end
     respond_to do |format|
       if @dog.save
-        # @dog.images.attach(params[:dog][:image]) if params[:dog][:image].present?
-        
-
         format.html { redirect_to @dog, notice: 'Dog was successfully created.' }
         format.json { render :show, status: :created, location: @dog }
       else

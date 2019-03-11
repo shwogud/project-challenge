@@ -1,6 +1,32 @@
 <section>
   <h2><%= @dog.name %></h2>
 
+  <% if !current_user.dogs.include?(@dog) %>
+    <% if @dog.user_likes.include?(current_user) && !current_user.dogs.include?(@dog) %>
+      <%= button_to 'remove like', dog_like_path(@dog, @dog.likes.select { |like| like.user_id == current_user.id }[0].id), method: :delete %>
+      <p><%= @dog.likes.count %> <%= (@dog.likes.count) == 1 ? 'Like' : 'Likes'%></p>
+      <i class="far fa-heart unlike"></i>
+    <% else %>
+        <% if @dog.likes.count == 0 %>
+          <p> 0 Likes</p>
+        <% else %>
+          <p><%= @dog.likes.count %> <%= (@dog.likes.count) == 1 ? 'Like' : 'Likes'%></p>
+        <% end %>
+        <%= button_to 'Like', dog_likes_path(@dog), method: :post %>
+        <i class="far fa-heart like"></i>
+    <% end %>
+
+  <% else %>
+        <% if @dog.likes.count == 0 %>
+          <p> 0 Likes</p>
+        <% else %>
+          <p><%= @dog.likes.count %> <%= (@dog.likes.count) == 1 ? 'Like' : 'Likes'%></p>
+        <% end %>
+  <% end %>
+
+
+
+
   <% @dog.images.each do |image| %>
     <%= image_tag url_for(image), alt: "Photo of #{@dog.name}" %>
   <% end %>

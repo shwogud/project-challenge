@@ -5,14 +5,3 @@
   </article>
 </a>
 
-<% if dog.user_likes.include?(current_user) %>
-  <p><%= dog.likes.count %> <%= (dog.likes.count) == 1 ? 'Like' : 'Likes'%></p>
-  <%= button_to 'remove like', dog_like_path(dog, dog.likes.select { |like| like.user_id == current_user.id }[0].id), method: :delete %>
-  <i class="far fa-heart unlike"></i>
-<% else %>
-  <p> 0 Likes</p>
-  <%= button_to 'Like', dog_likes_path(dog), method: :post %>
-  <i class="far fa-heart like"></i>
-  
-
-<% end %>

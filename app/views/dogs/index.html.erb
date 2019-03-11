@@ -1,3 +1,11 @@
 <%= will_paginate @dogs%>
-<%= render partial: 'thumbnail', collection: @dogs, as: :dog %>
-<%-# commented line -%>
+
+<% @dogs.each_with_index do |dog, idx| %>
+  <% if idx == 1 || idx == 3 %>
+    <%= render partial: 'thumbnail', :locals => { :dog => dog } %>
+    <%= image_tag ( "ad.jpg") %>
+
+  <% else %>
+    <%= render partial: 'thumbnail', :locals => { :dog => dog } %>
+  <% end %>
+<% end %>
